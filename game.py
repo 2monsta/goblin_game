@@ -1,6 +1,9 @@
 #include pygame
 	#include pygame which we got from pip
-import pygame
+import pygame;
+
+# from the math module(build into python) get the fabs object
+from math import fabs;
 #init pygame
 # inorder to use pygame, we have to run the init method
 pygame.init();
@@ -14,12 +17,17 @@ pygame.display.set_caption("Goblin Chase");
 #set up a var with our
 background_image = pygame.image.load("./images/background.png"); #can use a different image just got to know the size
 hero_image = pygame.image.load("./images/hero.png"); #can use a different image just got to know the size
-
+goblin_image = pygame.image.load("./images/goblin.png");
 #set up the hero location
 hero = {
 	"x":100,
 	"y":100,
 	"speed": 10
+}
+goblin = {
+	"x":50,
+	"y":50,
+	"speed": 15
 }
 keys = {
 	"up":273,
@@ -61,6 +69,17 @@ while(game_on):
 			elif(event.key == keys["left"]):
 				#hero["x"] -= hero["speed"];
 				keys_down["left"] = True;
+		elif(event.type == pygame.KEYUP):
+			#user let go of a key, see if its the one that matters
+			if(event.key == keys["up"]):
+				# user let go of the up key, flip the switch
+				keys_down["up"] = False;
+			elif(event.key == keys["down"]):
+				keys_down["down"] = False;
+			elif(event.key == keys["right"]):
+				keys_down["right"] = False;
+			elif(event.key == keys["left"]):
+				keys_down["left"] = False;
 
 	if(keys_down["up"]):
 		hero["y"] -= hero["speed"];
@@ -70,12 +89,21 @@ while(game_on):
 		hero["x"] -= hero["speed"];
 	elif(keys_down["right"]):
 		hero["x"] += hero["speed"];
+
+	#Collision detection
+	distance_between = fabs(hero["x"] - goblin["x"]) + fabs(hero["y"] - goblin["y"]);
+	if distance_between < 32:
+		#the hero and goblin are touching
+		print "collision";
+	else:
+		print("not touching");
 	# #actually render something
 	# blit takes two argument, block level image transfer
 	# 1) what do you want to draw
 	# 2) where do oyu want to draw it
 	pygame_screen.blit(background_image, [0,0]);
 	pygame_screen.blit(hero_image, [hero["x"],hero["y"]]);
+	pygame_screen.blit(goblin_image, [goblin["x"], goblin["y"]]);
 #fill in the screen with a color (or image);
 # repeat 6 over and over and over....
 	pygame.display.flip(); #flip to start over the while loop
