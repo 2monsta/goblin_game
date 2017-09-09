@@ -68,6 +68,10 @@ mushroom = {
 # create a boolean wheater a game should be going or not
 game_on = True;
 while(game_on):
+
+	#================================================
+	#WORKING ON MOVE SPEED OF GOBLIN
+	#at the start, we want goblin to move randomly
 	goblin["x"] += goblin["speed"];
 	if(goblin["x"] >= 500):
 		goblin["x"] = 100;
@@ -77,8 +81,6 @@ while(game_on):
 		goblin["x"] -=goblin["speed"] + 70;
 	elif(goblin["x"] <= 0):
 		goblin["x"] -=goblin["speed"];
-
-	#at the start, we want goblin to move randomly
 
 	# we are inside the main game loop
 	# it will keep running as long as our boolean is true;
