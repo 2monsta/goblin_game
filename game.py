@@ -1,6 +1,7 @@
 #include pygame
 	#include pygame which we got from pip
 import pygame;
+import random;
 
 # from the math module(build into python) get the fabs object
 from math import fabs;
@@ -10,6 +11,10 @@ pygame.init();
 
 #create a screen with a particular size, the screen size MUST be a TUPLE
 screen_size = (512, 480);
+
+#generating random locations after goblin has collide with hero
+randGobX = random.randint(0,100);
+randGobY = random.randint(0,100);
 #actually tell pygame to set the screen up and store it
 pygame_screen = pygame.display.set_mode(screen_size);
 #set a pointless caption
@@ -22,11 +27,12 @@ goblin_image = pygame.image.load("./images/goblin.png");
 hero = {
 	"x":100,
 	"y":100,
-	"speed": 10
+	"speed": 10,
+	"wins": 0
 }
 goblin = {
-	"x":50,
-	"y":50,
+	"x": 50,
+	"y": 50,
 	"speed": 15
 }
 keys = {
@@ -92,9 +98,12 @@ while(game_on):
 
 	#Collision detection
 	distance_between = fabs(hero["x"] - goblin["x"]) + fabs(hero["y"] - goblin["y"]);
-	if distance_between < 32:
+	if (distance_between) < 32:
 		#the hero and goblin are touching
 		print "collision";
+		hero["wins"] += 1;
+		print("You Win the Game");
+		break;
 	else:
 		print("not touching");
 	# #actually render something
@@ -102,6 +111,11 @@ while(game_on):
 	# 1) what do you want to draw
 	# 2) where do oyu want to draw it
 	pygame_screen.blit(background_image, [0,0]);
+		#set a font so we can write the screen
+	font = pygame.font.Font(None, 25);
+	wins_text = font.render("wins: %d" %(hero["wins"]), True, (0,0,0));
+	pygame_screen.blit(wins_text, [40, 40]);
+
 	pygame_screen.blit(hero_image, [hero["x"],hero["y"]]);
 	pygame_screen.blit(goblin_image, [goblin["x"], goblin["y"]]);
 #fill in the screen with a color (or image);
