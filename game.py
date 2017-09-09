@@ -63,29 +63,33 @@ monster = {
 # game loop (while)
 # create a boolean wheater a game should be going or not
 game_on = True;
-goblin_alivex = True;
-goblin_alivey = True;
+goblin_movementX = True;
+goblin_movementY = True;
+monster_power_up = True;
+
 while(game_on):
 
 	#================================================
 	#WORKING ON MOVE SPEED OF GOBLIN
 	#at the start, we want goblin to move randomly
-	if(goblin_alivex == True):
+	if(goblin_movementX == True):
 		goblin["x"] += goblin["speed"];
 		if(goblin["x"] >= 450):
-			goblin_alivex = False;
-	elif(goblin_alivey == False):
+			goblin_movementX = False;
+	elif(goblin_movementY == False):
 		goblin["y"] -= goblin["speed"];
 		if(goblin["y"] < 70):
-			goblin_alivey = True;
-	if(goblin_alivey == True):
+			goblin_movementY = True;
+	if(goblin_movementY == True):
 		goblin["y"] += goblin["speed"];
 		if(goblin["y"] >400):
-			goblin_alivey = False;
-	elif(goblin_alivex == False):
+			goblin_movementY = False;
+	elif(goblin_movementX == False):
 		goblin["x"] -= goblin["speed"];
 		if(goblin["x"] <= 70):
-			goblin_alivex = True;
+			goblin_movementX = True;
+
+
 	# we are inside the main game loop
 	# it will keep running as long as our boolean is true;
 	#a quit event(python needs an escape);
@@ -136,10 +140,6 @@ while(game_on):
 		hero["health"] -=1;
 		if(hero["health"]<= 0):
 			hero["health"] = 0;
-	if(distance_betweenHM<32):
-		hero["health"] +=1
-		if(hero["health"] >=3):
-			hero["health"] =3;
 
 	# #actually render something
 	# blit takes two argument, block level image transfer
@@ -156,8 +156,16 @@ while(game_on):
 
 	pygame_screen.blit(hero_image, [hero["x"],hero["y"]]);
 	pygame_screen.blit(goblin_image, [goblin["x"], goblin["y"]]);
-	pygame_screen.blit(monster_image, [monster["x"], monster["y"]]);
-	#pygame_screen.blit(mushroom_image, [mushroom["x"], mushroom["y"]]);
+
+	#========================
+	#working on powerup and reapearing after collision
+	if(monster_power_up == True):
+		pygame_screen.blit(monster_image, [monster["x"], monster["y"]]);
+		if(distance_betweenHM<32):
+			pygame_screen.blit(monster_image, [0, 0]);
+			hero["speed"] += 5;
+			goblin["speed"] -=1;
+			monster_power_up = False;
 
 
 #fill in the screen with a color (or image);
