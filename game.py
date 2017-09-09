@@ -53,8 +53,8 @@ keys_down ={
 	"right": False,
 }
 monster = {
-	"x": 150,
-	"y": 150,
+	"x": random.randint(70, 450),
+	"y": random.randint(70, 400),
 	"speed": 20
 }
 
@@ -66,6 +66,7 @@ game_on = True;
 goblin_movementX = True;
 goblin_movementY = True;
 monster_power_up = True;
+monster_returns_to_map = True;
 
 while(game_on):
 
@@ -162,10 +163,17 @@ while(game_on):
 	if(monster_power_up == True):
 		pygame_screen.blit(monster_image, [monster["x"], monster["y"]]);
 		if(distance_betweenHM<32):
-			pygame_screen.blit(monster_image, [0, 0]);
+			pygame_screen.blit(monster_image, [-10, -10]);
 			hero["speed"] += 5;
 			goblin["speed"] -=1;
 			monster_power_up = False;
+			monster_returns_to_map = False;
+	if(monster_returns_to_map == False):
+		monster["x"] = random.randint(70, 450);
+		monster["y"] = random.randint(70, 400);
+		pygame_screen.blit(monster_image, [monster["x"], monster["y"]]);
+		monster_returns_to_map = True;
+		monster_power_up = True;
 
 
 #fill in the screen with a color (or image);
