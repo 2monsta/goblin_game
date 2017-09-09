@@ -2,6 +2,7 @@
 	#include pygame which we got from pip
 import pygame;
 import random;
+import time;
 
 # from the math module(build into python) get the fabs object
 from math import fabs;
@@ -11,10 +12,8 @@ pygame.init();
 
 #create a screen with a particular size, the screen size MUST be a TUPLE
 screen_size = (512, 480);
-
 #generating random locations after goblin has collide with hero
-randGobX = random.randint(0,100);
-randGobY = random.randint(0,100);
+
 #actually tell pygame to set the screen up and store it
 pygame_screen = pygame.display.set_mode(screen_size);
 #set a pointless caption
@@ -23,17 +22,22 @@ pygame.display.set_caption("Goblin Chase");
 background_image = pygame.image.load("./images/background.png"); #can use a different image just got to know the size
 hero_image = pygame.image.load("./images/hero.png"); #can use a different image just got to know the size
 goblin_image = pygame.image.load("./images/goblin.png");
+monster_image = pygame.image.load("./images/monster.png");
+#mushroom_image = pygame.image.load("./images/mushroom.png")
+
 #set up the hero location
 hero = {
 	"x":100,
 	"y":100,
 	"speed": 10,
-	"wins": 0
+	"wins": 0,
+	"health": 3
 }
 goblin = {
-	"x": 50,
-	"y": 50,
-	"speed": 15
+	"x": random.randint(1, 500),
+	"y": random.randint(1,400),
+	"speed": 1,
+	"health": 3,
 }
 keys = {
 	"up":273,
@@ -48,11 +52,34 @@ keys_down ={
 	"left": False,
 	"right": False,
 }
+monster = {
+	"x": 150,
+	"y": 150,
+	"speed": 20
+}
+mushroom = {
+	"x": random.randint(100, 300),
+	"y": random.randint(100, 300),
+}
+
+
 
 # game loop (while)
 # create a boolean wheater a game should be going or not
 game_on = True;
 while(game_on):
+	goblin["x"] += goblin["speed"];
+	if(goblin["x"] >= 500):
+		goblin["x"] = 100;
+	elif(goblin["x"] <= 0):
+		goblin["x"] <= 110
+	if(goblin["x"] >= 500):
+		goblin["x"] -=goblin["speed"] + 70;
+	elif(goblin["x"] <= 0):
+		goblin["x"] -=goblin["speed"];
+
+	#at the start, we want goblin to move randomly
+
 	# we are inside the main game loop
 	# it will keep running as long as our boolean is true;
 	#a quit event(python needs an escape);
@@ -62,7 +89,6 @@ while(game_on):
 			# the user clicked the red x in the top left 
 			game_on = False;
 		elif (event.type == pygame.KEYDOWN):
-			print("user pressed a key");
 			if event.key == keys["up"]:
 				#hero["y"] -= hero["speed"];
 				keys_down["up"] = True;
@@ -98,14 +124,17 @@ while(game_on):
 
 	#Collision detection
 	distance_between = fabs(hero["x"] - goblin["x"]) + fabs(hero["y"] - goblin["y"]);
-	if (distance_between) < 32:
-		#the hero and goblin are touching
-		print "collision";
-		hero["wins"] += 1;
-		print("You Win the Game");
-		break;
-	else:
-		print("not touching");
+	distance_betweenHM = fabs(hero["x"] - monster["x"]) + fabs(hero["y"] - monster["y"]);
+	if (distance_between < 32):
+		#the hero and goblin are touching		
+		hero["health"] -=1;
+		if(hero["health"]<= 0):
+			hero["health"] = 0;
+	if(distance_betweenHM<32):
+		hero["health"] +=1
+		if(hero["health"] >=3):
+			hero["health"] =3;
+
 	# #actually render something
 	# blit takes two argument, block level image transfer
 	# 1) what do you want to draw
@@ -116,8 +145,15 @@ while(game_on):
 	wins_text = font.render("wins: %d" %(hero["wins"]), True, (0,0,0));
 	pygame_screen.blit(wins_text, [40, 40]);
 
+	hero_health = font.render("health %d" %(hero["health"]), True, (0, 0, 0) )
+	pygame_screen.blit(hero_health, [400, 40]);
+
 	pygame_screen.blit(hero_image, [hero["x"],hero["y"]]);
 	pygame_screen.blit(goblin_image, [goblin["x"], goblin["y"]]);
+	pygame_screen.blit(monster_image, [monster["x"], monster["y"]]);
+	#pygame_screen.blit(mushroom_image, [mushroom["x"], mushroom["y"]]);
+
+
 #fill in the screen with a color (or image);
 # repeat 6 over and over and over....
 	pygame.display.flip(); #flip to start over the while loop
