@@ -34,9 +34,9 @@ hero = {
 	"health": 3
 }
 goblin = {
-	"x": random.randint(1, 500),
-	"y": random.randint(1,400),
-	"speed": 1,
+	"x": random.randint(70, 450),
+	"y": random.randint(70,400),
+	"speed": 3,
 	"health": 3,
 }
 keys = {
@@ -57,31 +57,35 @@ monster = {
 	"y": 150,
 	"speed": 20
 }
-mushroom = {
-	"x": random.randint(100, 300),
-	"y": random.randint(100, 300),
-}
 
 
 
 # game loop (while)
 # create a boolean wheater a game should be going or not
 game_on = True;
+goblin_alivex = True;
+goblin_alivey = True;
 while(game_on):
 
 	#================================================
 	#WORKING ON MOVE SPEED OF GOBLIN
 	#at the start, we want goblin to move randomly
-	goblin["x"] += goblin["speed"];
-	if(goblin["x"] >= 500):
-		goblin["x"] = 100;
-	elif(goblin["x"] <= 0):
-		goblin["x"] <= 110
-	if(goblin["x"] >= 500):
-		goblin["x"] -=goblin["speed"] + 70;
-	elif(goblin["x"] <= 0):
-		goblin["x"] -=goblin["speed"];
-
+	if(goblin_alivex == True):
+		goblin["x"] += goblin["speed"];
+		if(goblin["x"] >= 450):
+			goblin_alivex = False;
+	elif(goblin_alivey == False):
+		goblin["y"] -= goblin["speed"];
+		if(goblin["y"] < 70):
+			goblin_alivey = True;
+	if(goblin_alivey == True):
+		goblin["y"] += goblin["speed"];
+		if(goblin["y"] >400):
+			goblin_alivey = False;
+	elif(goblin_alivex == False):
+		goblin["x"] -= goblin["speed"];
+		if(goblin["x"] <= 70):
+			goblin_alivex = True;
 	# we are inside the main game loop
 	# it will keep running as long as our boolean is true;
 	#a quit event(python needs an escape);
