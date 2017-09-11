@@ -9,9 +9,11 @@ from math import fabs;
 #init pygame
 # inorder to use pygame, we have to run the init method
 pygame.init();
-
+screenX = 512;
+screenY = 480;
 #create a screen with a particular size, the screen size MUST be a TUPLE
-screen_size = (512, 480);
+screen_size = (screenX, screenY);
+
 #generating random locations after goblin has collide with hero
 
 #actually tell pygame to set the screen up and store it
@@ -19,8 +21,11 @@ pygame_screen = pygame.display.set_mode(screen_size);
 #set a pointless caption
 pygame.display.set_caption("Goblin Chase");
 #set up a var with our
-background_image = pygame.image.load("./images/background.png"); #can use a different image just got to know the size
-hero_image = pygame.image.load("./images/hero.png"); #can use a different image just got to know the size
+
+#can use a different image just got to know the size
+background_image = pygame.image.load("./images/background.png");
+ #can use a different image just got to know the size
+hero_image = pygame.image.load("./images/hero.png");
 goblin_image = pygame.image.load("./images/goblin.png");
 monster_image = pygame.image.load("./images/monster.png");
 #mushroom_image = pygame.image.load("./images/mushroom.png")
@@ -34,8 +39,8 @@ hero = {
 	"health": 3
 }
 goblin = {
-	"x": random.randint(70, 450),
-	"y": random.randint(70,400),
+	"x": screenX / 2,
+	"y": screenY / 2,
 	"speed": 3,
 	"health": 3,
 }
@@ -59,38 +64,59 @@ monster = {
 }
 
 
+def top_right():
+	goblin["x"] +=1;
+	goblin["y"] +=1;
+def top_left():
+	goblin["x"] -=1;
+	goblin["y"] +=1;
+def bottom_right():
+	goblin["x"] +=1;
+	goblin["y"] -=1;
+def bottom_left():
+	goblin["x"] -=1;
+	goblin["y"] -=1;
+
+
 
 # game loop (while)
 # create a boolean wheater a game should be going or not
 game_on = True;
-goblin_movementX = True;
-goblin_movementY = True;
+#added key flip switch
+
 monster_power_up = True;
 monster_returns_to_map = True;
+hero_max_health = True;
 
 while(game_on):
 
-	#================================================
+#===================Goblin Moving========
 	#WORKING ON MOVE SPEED OF GOBLIN
-	#at the start, we want goblin to move randomly
-	if(goblin_movementX == True):
-		goblin["x"] += goblin["speed"];
-		if(goblin["x"] >= 450):
-			goblin_movementX = False;
-	elif(goblin_movementY == False):
-		goblin["y"] -= goblin["speed"];
-		if(goblin["y"] < 70):
-			goblin_movementY = True;
-	if(goblin_movementY == True):
-		goblin["y"] += goblin["speed"];
-		if(goblin["y"] >400):
-			goblin_movementY = False;
-	elif(goblin_movementX == False):
-		goblin["x"] -= goblin["speed"];
-		if(goblin["x"] <= 70):
-			goblin_movementX = True;
+	#at the start, we want goblin to move randomly towards the hero
+	if(hero["x"] > screenX /2 and hero["y"] > screenY /2):
+		top_right();
+	elif(hero["x"] < screenX /2 and hero["y"] > screenY /2):
+		top_left();
+	elif(hero["x"] > screenX /2 and hero["y"] < screenY /2):
+		bottom_right();
+	elif(hero["x"] < screenX /2 and hero["y"] < screenY /2):
+		bottom_left();
+
+	
+#=============Keep Hero on Screen =====
+
+	if(hero["x"] <= 0):
+		hero["x"] = 0;
+	elif(hero["x"]> 480):
+		hero["x"] = 480
+	if(hero["y"] < 0):
+		hero["y"] = 0;
+	elif(hero["y"] > 450):
+		hero["y"] = 450;
 
 
+#=============EVENT HANDLE=============
+		
 	# we are inside the main game loop
 	# it will keep running as long as our boolean is true;
 	#a quit event(python needs an escape);
@@ -158,8 +184,8 @@ while(game_on):
 	pygame_screen.blit(hero_image, [hero["x"],hero["y"]]);
 	pygame_screen.blit(goblin_image, [goblin["x"], goblin["y"]]);
 
-	#========================
-	#working on powerup and reapearing after collision
+#========================Monster As power UP=============
+	#Monster now respond after collision, can change to power up later.
 	if(monster_power_up == True):
 		pygame_screen.blit(monster_image, [monster["x"], monster["y"]]);
 		if(distance_betweenHM<32):
@@ -168,6 +194,13 @@ while(game_on):
 			goblin["speed"] -=1;
 			monster_power_up = False;
 			monster_returns_to_map = False;
+			if(hero["speed"] == 25):
+				hero["speed"] = 25;
+			if(hero_max_health == True):
+				hero["health"] += 1;
+			if(hero["health"] >=3):
+				hero["health"] =3;
+				#hero_max_health = False;
 	if(monster_returns_to_map == False):
 		monster["x"] = random.randint(70, 450);
 		monster["y"] = random.randint(70, 400);
