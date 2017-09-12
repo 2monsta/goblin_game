@@ -5,7 +5,7 @@ import random;
 import time;
 
 # from the math module(build into python) get the fabs object
-from math import fabs;
+from math import fabs, hypot;
 #init pygame
 # inorder to use pygame, we have to run the init method
 pygame.init();
@@ -26,8 +26,7 @@ background_image = pygame.image.load("./images/background.png");
  #can use a different image just got to know the size
 hero_image = pygame.image.load("./images/hero.png");
 goblin_image = pygame.image.load("./images/goblin.png");
-monster_image = pygame.image.load("./images/monster.png");
-#mushroom_image = pygame.image.load("./images/mushroom.png")
+power_up_image = pygame.image.load("./images/asuna.jpg");
 
 #set up the hero location
 hero = {
@@ -63,18 +62,18 @@ monster = {
 }
 
 
-def top_right():
-	goblin["x"] +=1;
-	goblin["y"] +=1;
-def top_left():
-	goblin["x"] -=1;
-	goblin["y"] +=1;
-def bottom_right():
-	goblin["x"] +=1;
-	goblin["y"] -=1;
-def bottom_left():
-	goblin["x"] -=1;
-	goblin["y"] -=1;
+# def top_right():
+# 	goblin["x"] +=1;
+# 	goblin["y"] +=1;
+# def top_left():
+# 	goblin["x"] -=1;
+# 	goblin["y"] +=1;
+# def bottom_right():
+# 	goblin["x"] +=1;
+# 	goblin["y"] -=1;
+# def bottom_left():
+# 	goblin["x"] -=1;
+# 	goblin["y"] -=1;
 #=============Keep Hero on Screen =====
 def keep_hero():
 	if(hero["x"] <= 0):
@@ -87,15 +86,15 @@ def keep_hero():
 		hero["y"] = 450;
 
 #===================Goblin Moving========
-def goblin_moving():
-	if(hero["x"] > screenX /2 and hero["y"] > screenY /2):
-		top_right();
-	elif(hero["x"] < screenX /2 and hero["y"] > screenY /2):
-		top_left();
-	elif(hero["x"] > screenX /2 and hero["y"] < screenY /2):
-		bottom_right();
-	elif(hero["x"] < screenX /2 and hero["y"] < screenY /2):
-		bottom_left();
+# def goblin_moving():
+# 	if(hero["x"] > screenX /2 and hero["y"] > screenY /2):
+# 		top_right();
+# 	elif(hero["x"] < screenX /2 and hero["y"] > screenY /2):
+# 		top_left();
+# 	elif(hero["x"] > screenX /2 and hero["y"] < screenY /2):
+# 		bottom_right();
+# 	elif(hero["x"] < screenX /2 and hero["y"] < screenY /2):
+# 		bottom_left();
 
 
 # game loop (while)
@@ -112,18 +111,9 @@ while(game_on):
 #===================Goblin Moving========
 	#WORKING ON MOVE SPEED OF GOBLIN
 	#at the start, we want goblin to move randomly towards the hero
-	goblin_moving();
+	# goblin_moving();
 	
-
-#=============Keep Goblin on Screen =====	
-	if(goblin["x"] <= 0):
-		bottom_right();
-	elif(goblin["x"]> 480):
-		bottom_left();
-	if(goblin["y"] < 0):
-		top_right();
-	elif(goblin["y"] > 450):
-		top_left();
+	
 
 #=============Keep Hero on Screen =====
 	keep_hero();
@@ -175,10 +165,24 @@ while(game_on):
 	distance_between = fabs(hero["x"] - goblin["x"]) + fabs(hero["y"] - goblin["y"]);
 	#distance between hero and monster
 	distance_betweenHM = fabs(hero["x"] - monster["x"]) + fabs(hero["y"] - monster["y"]);
+	# ==================================================================
+	#keep goblin move towards to hero
+	dx = goblin["x"] - hero["x"];
+	dy = goblin["y"] - hero["y"];
+	dist = hypot(dx, dy);
+
+	dx = dx/dist;
+	dy = dy/dist;
+	goblin["x"] -= dx * goblin["speed"];
+	goblin["y"] -= dy * goblin["speed"];
+	# =============================================================================
 	if (distance_between < 32):
+		goblin["x"] = 200;
+		goblin["y"] = 200;
+		goblin["speed"] += 1;
 		#the hero and goblin are touching		
 		hero["health"] -=1;
-		hero["speed"] -=10;
+		hero["speed"] -=5;
 		if(hero["health"]<= 0):
 			hero["health"] = 0;
 		if(hero["speed"] <= 0):
@@ -203,9 +207,9 @@ while(game_on):
 #========================Monster As power UP=============
 	#Monster now respond after collision, can change to power up later.
 	if(monster_power_up == True):
-		pygame_screen.blit(monster_image, [monster["x"], monster["y"]]);
+		pygame_screen.blit(power_up_image, [monster["x"], monster["y"]]);
 		if(distance_betweenHM<32):
-			pygame_screen.blit(monster_image, [-10, -10]);
+			pygame_screen.blit(power_up_image, [-10, -10]);
 			hero["speed"] += 5;
 			goblin["speed"] -=1;
 			monster_power_up = False;
@@ -216,11 +220,11 @@ while(game_on):
 				hero["health"] += 1;
 			if(hero["health"] >=3):
 				hero["health"] =3;
-				#hero_max_health = False;
+				pygame_screen.blit(power_up_image, [-10, -10]);
 	if(monster_returns_to_map == False):
 		monster["x"] = random.randint(70, 450);
 		monster["y"] = random.randint(70, 400);
-		pygame_screen.blit(monster_image, [monster["x"], monster["y"]]);
+		pygame_screen.blit(power_up_image, [monster["x"], monster["y"]]);
 		monster_returns_to_map = True;
 		monster_power_up = True;
 
