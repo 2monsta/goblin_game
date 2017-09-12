@@ -14,13 +14,12 @@ screenY = 480;
 #create a screen with a particular size, the screen size MUST be a TUPLE
 screen_size = (screenX, screenY);
 
-#generating random locations after goblin has collide with hero
 
 #actually tell pygame to set the screen up and store it
 pygame_screen = pygame.display.set_mode(screen_size);
 #set a pointless caption
 pygame.display.set_caption("Goblin Chase");
-#set up a var with our
+
 
 #can use a different image just got to know the size
 background_image = pygame.image.load("./images/background.png");
@@ -76,7 +75,27 @@ def bottom_right():
 def bottom_left():
 	goblin["x"] -=1;
 	goblin["y"] -=1;
+#=============Keep Hero on Screen =====
+def keep_hero():
+	if(hero["x"] <= 0):
+		hero["x"] = 0;
+	elif(hero["x"]> 480):
+		hero["x"] = 480
+	if(hero["y"] < 0):
+		hero["y"] = 0;
+	elif(hero["y"] > 450):
+		hero["y"] = 450;
 
+#===================Goblin Moving========
+def goblin_moving():
+	if(hero["x"] > screenX /2 and hero["y"] > screenY /2):
+		top_right();
+	elif(hero["x"] < screenX /2 and hero["y"] > screenY /2):
+		top_left();
+	elif(hero["x"] > screenX /2 and hero["y"] < screenY /2):
+		bottom_right();
+	elif(hero["x"] < screenX /2 and hero["y"] < screenY /2):
+		bottom_left();
 
 
 # game loop (while)
@@ -93,28 +112,21 @@ while(game_on):
 #===================Goblin Moving========
 	#WORKING ON MOVE SPEED OF GOBLIN
 	#at the start, we want goblin to move randomly towards the hero
-	if(hero["x"] > screenX /2 and hero["y"] > screenY /2):
-		top_right();
-	elif(hero["x"] < screenX /2 and hero["y"] > screenY /2):
-		top_left();
-	elif(hero["x"] > screenX /2 and hero["y"] < screenY /2):
-		bottom_right();
-	elif(hero["x"] < screenX /2 and hero["y"] < screenY /2):
-		bottom_left();
-
+	goblin_moving();
 	
+
+#=============Keep Goblin on Screen =====	
+	if(goblin["x"] <= 0):
+		bottom_right();
+	elif(goblin["x"]> 480):
+		bottom_left();
+	if(goblin["y"] < 0):
+		top_right();
+	elif(goblin["y"] > 450):
+		top_left();
+
 #=============Keep Hero on Screen =====
-
-	if(hero["x"] <= 0):
-		hero["x"] = 0;
-	elif(hero["x"]> 480):
-		hero["x"] = 480
-	if(hero["y"] < 0):
-		hero["y"] = 0;
-	elif(hero["y"] > 450):
-		hero["y"] = 450;
-
-
+	keep_hero();
 #=============EVENT HANDLE=============
 		
 	# we are inside the main game loop
@@ -161,12 +173,16 @@ while(game_on):
 
 	#Collision detection
 	distance_between = fabs(hero["x"] - goblin["x"]) + fabs(hero["y"] - goblin["y"]);
+	#distance between hero and monster
 	distance_betweenHM = fabs(hero["x"] - monster["x"]) + fabs(hero["y"] - monster["y"]);
 	if (distance_between < 32):
 		#the hero and goblin are touching		
 		hero["health"] -=1;
+		hero["speed"] -=10;
 		if(hero["health"]<= 0):
 			hero["health"] = 0;
+		if(hero["speed"] <= 0):
+			hero["speed"] = 10;
 
 	# #actually render something
 	# blit takes two argument, block level image transfer
