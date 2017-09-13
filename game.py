@@ -9,6 +9,7 @@ from math import fabs, hypot;
 #init pygame
 # inorder to use pygame, we have to run the init method
 pygame.init();
+pygame.mixer.init();
 screenX = 512;
 screenY = 480;
 #create a screen with a particular size, the screen size MUST be a TUPLE
@@ -20,6 +21,8 @@ pygame_screen = pygame.display.set_mode(screen_size);
 #set a pointless caption
 pygame.display.set_caption("Goblin Chase");
 
+pygame.mixer.music.load("./music/thankyou.mp3");
+pygame.mixer.music.play(-1, 0.0);
 
 #can use a different image just got to know the size
 background_image = pygame.image.load("./images/background.png");
@@ -27,6 +30,7 @@ background_image = pygame.image.load("./images/background.png");
 hero_image = pygame.image.load("./images/hero.png");
 goblin_image = pygame.image.load("./images/goblin.png");
 power_up_image = pygame.image.load("./images/asuna.jpg");
+monster_image = pygame.image.load("./images/monster.png");
 
 #set up the hero location
 hero = {
@@ -56,45 +60,12 @@ keys_down ={
 	"right": False,
 }
 monster = {
-	"x": random.randint(70, 450),
-	"y": random.randint(70, 400),
-	"speed": 20
+	"x": 100,
+	"y": 150,
+	"speed": 20,
+	"dx":1,
+	"dy":1
 }
-
-
-# def top_right():
-# 	goblin["x"] +=1;
-# 	goblin["y"] +=1;
-# def top_left():
-# 	goblin["x"] -=1;
-# 	goblin["y"] +=1;
-# def bottom_right():
-# 	goblin["x"] +=1;
-# 	goblin["y"] -=1;
-# def bottom_left():
-# 	goblin["x"] -=1;
-# 	goblin["y"] -=1;
-#=============Keep Hero on Screen =====
-def keep_hero():
-	if(hero["x"] <= 0):
-		hero["x"] = 0;
-	elif(hero["x"]> 480):
-		hero["x"] = 480
-	if(hero["y"] < 0):
-		hero["y"] = 0;
-	elif(hero["y"] > 450):
-		hero["y"] = 450;
-
-#===================Goblin Moving========
-# def goblin_moving():
-# 	if(hero["x"] > screenX /2 and hero["y"] > screenY /2):
-# 		top_right();
-# 	elif(hero["x"] < screenX /2 and hero["y"] > screenY /2):
-# 		top_left();
-# 	elif(hero["x"] > screenX /2 and hero["y"] < screenY /2):
-# 		bottom_right();
-# 	elif(hero["x"] < screenX /2 and hero["y"] < screenY /2):
-# 		bottom_left();
 
 
 # game loop (while)
@@ -102,21 +73,12 @@ def keep_hero():
 game_on = True;
 #added key flip switch
 
-monster_power_up = True;
-monster_returns_to_map = True;
+power_up = True;
+asuna_returns_to_map = True;
 hero_max_health = True;
-
+tick = 0;
 while(game_on):
-
-#===================Goblin Moving========
-	#WORKING ON MOVE SPEED OF GOBLIN
-	#at the start, we want goblin to move randomly towards the hero
-	# goblin_moving();
-	
-	
-
-#=============Keep Hero on Screen =====
-	keep_hero();
+	tick +=1;
 #=============EVENT HANDLE=============
 		
 	# we are inside the main game loop
@@ -151,20 +113,23 @@ while(game_on):
 				keys_down["right"] = False;
 			elif(event.key == keys["left"]):
 				keys_down["left"] = False;
-
 	if(keys_down["up"]):
-		hero["y"] -= hero["speed"];
+		if(hero["y"] > 0):
+			hero["y"] -= hero["speed"];
 	elif(keys_down["down"]):
-		hero["y"] += hero["speed"];
+		if hero['y'] < (480-32):	
+			hero["y"] += hero["speed"];
 	if(keys_down["left"]):
-		hero["x"] -= hero["speed"];
+		if hero['x'] > 0:
+			hero["x"] -= hero["speed"];
 	elif(keys_down["right"]):
-		hero["x"] += hero["speed"];
+		if hero['x'] < (512-32):
+			hero["x"] += hero["speed"];
 
 	#Collision detection
 	distance_between = fabs(hero["x"] - goblin["x"]) + fabs(hero["y"] - goblin["y"]);
 	#distance between hero and monster
-	distance_betweenHM = fabs(hero["x"] - monster["x"]) + fabs(hero["y"] - monster["y"]);
+	distance_betweenHA = fabs(hero["x"] - monster["x"]) + fabs(hero["y"] - monster["y"]);
 	# ==================================================================
 	#keep goblin move towards to hero
 	dx = goblin["x"] - hero["x"];
@@ -176,10 +141,19 @@ while(game_on):
 	goblin["x"] -= dx * goblin["speed"];
 	goblin["y"] -= dy * goblin["speed"];
 	# =============================================================================
+	if(tick % 30==0):
+		monster["dx"] = random.randint(-1,1);
+		monster["dy"] = random.randint(-1, 1);
+	monster["dx"] -= dx * monster["speed"];
+	monster["dy"] -= dy * monster["speed"];
+
+
 	if (distance_between < 32):
 		goblin["x"] = 200;
 		goblin["y"] = 200;
 		goblin["speed"] += 1;
+		if(goblin["speed"] >= 7):
+			goblin["speed"] = 7;
 		#the hero and goblin are touching		
 		hero["health"] -=1;
 		hero["speed"] -=5;
@@ -203,30 +177,30 @@ while(game_on):
 
 	pygame_screen.blit(hero_image, [hero["x"],hero["y"]]);
 	pygame_screen.blit(goblin_image, [goblin["x"], goblin["y"]]);
+	pygame_screen.blit(monster_image, [monster["x"], monster["y"]]);
 
-#========================Monster As power UP=============
-	#Monster now respond after collision, can change to power up later.
-	if(monster_power_up == True):
+#========================Asuna As power UP=============
+	#Asuna now respond after collision, can change to power up later.
+	if(power_up == True):
 		pygame_screen.blit(power_up_image, [monster["x"], monster["y"]]);
-		if(distance_betweenHM<32):
+		if(distance_betweenHA<32):
 			pygame_screen.blit(power_up_image, [-10, -10]);
 			hero["speed"] += 5;
 			goblin["speed"] -=1;
-			monster_power_up = False;
-			monster_returns_to_map = False;
+			power_up = False;
+			asuna_returns_to_map = False;
 			if(hero["speed"] == 25):
 				hero["speed"] = 25;
 			if(hero_max_health == True):
 				hero["health"] += 1;
-			if(hero["health"] >=3):
-				hero["health"] =3;
-				pygame_screen.blit(power_up_image, [-10, -10]);
-	if(monster_returns_to_map == False):
+			if(hero["health"] >=10):
+				hero["health"] =10;
+	if(asuna_returns_to_map == False):
 		monster["x"] = random.randint(70, 450);
 		monster["y"] = random.randint(70, 400);
 		pygame_screen.blit(power_up_image, [monster["x"], monster["y"]]);
-		monster_returns_to_map = True;
-		monster_power_up = True;
+		asuna_returns_to_map = True;
+		power_up = True;
 
 
 #fill in the screen with a color (or image);
